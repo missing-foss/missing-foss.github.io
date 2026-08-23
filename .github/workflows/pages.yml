@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2026 missing-foss
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Builds and deploys the landing page (Pages Source = "GitHub Actions").
+# Nothing here is a real build in the compile sense -- generate.py's whole
+# job is to re-derive the page from live GitHub API data (org repo list,
+# each repo's latest release) plus data/repos.yaml's small curated overlay,
+# so a sibling repo's new release or a brand-new repo shows up here without
+# anyone editing this repo (.github#2, missing-foss.github.io#1).
+#
+# Actions are SHA-pinned with a version comment, matching trobar-server's
+# docs.yml (this workflow copies its shape rather than re-deriving it) --
+# all actions/*, already covered by the org allowlist.
+name: pages
+on:
+  schedule:
+    # A few times a week at most is how often a release actually lands
+    # across the five sibling repos, so daily is frequent enough -- see
+    # .github#2's own reasoning for cron over a cross-repo
+    # repository_dispatch token (a materially worse trade for a few hours
+    # of latency this rarely matters).
+    - cron: "17 6 * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.x"
+      - run: pip install -r requirements.txt
+      - run: python3 generate.py _site
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

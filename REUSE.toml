@@ -1,0 +1,16 @@
+version = 1
+
+# Files that can't carry an SPDX header (binary, or no comment syntax).
+# First-party files carry in-file SPDX headers or a .license sidecar
+# instead — same convention as trobar-server/brand and trobar-garmin.
+
+[[annotations]]
+path = [
+    "LICENSE",
+    "LICENSES/*.txt",
+    "assets/brand/*.png",
+    ".gitignore",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 missing-foss"
+SPDX-License-Identifier = "GPL-3.0-or-later"

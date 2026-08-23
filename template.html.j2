@@ -1,0 +1,416 @@
+<!--
+SPDX-FileCopyrightText: 2026 missing-foss
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Missing FOSS</title>
+<meta name="description" content="Free software for the gaps nobody filled -- self-hosted tools built for real daily use.">
+<meta property="og:title" content="Missing FOSS">
+<meta property="og:description" content="Free software for the gaps nobody filled.">
+<meta property="og:image" content="https://missing-foss.github.io/assets/brand/social-preview.png">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<style>
+  :root {
+    --canvas:   #ffffff;
+    --surface:  #f4f6f2;
+    --accent:   #12a150;
+    --accent-dim: rgba(18, 161, 80, 0.78);
+    --text:     #0b0f0b;
+    --muted:    #55665c;
+    --rule:     #e4e6e1;
+    --shadow:   rgba(11, 15, 11, 0.06);
+
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --serif: ui-serif, Georgia, "Times New Roman", serif;
+
+    --measure: 68ch;
+    --step--1: clamp(0.78rem, 0.74rem + 0.18vw, 0.86rem);
+    --step-0:  clamp(0.95rem, 0.90rem + 0.22vw, 1.05rem);
+    --step-1:  clamp(1.15rem, 1.05rem + 0.45vw, 1.4rem);
+    --step-2:  clamp(1.5rem, 1.3rem + 0.9vw, 2.1rem);
+    --step-3:  clamp(2.1rem, 1.6rem + 2.4vw, 3.6rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --canvas:   #0b0f0b;
+      --surface:  #12160f;
+      --accent:   #34e06e;
+      --accent-dim: rgba(52, 224, 110, 0.72);
+      --text:     #eafff0;
+      --muted:    #7f9b86;
+      --rule:     #1e2a20;
+      --shadow:   rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --canvas:   #0b0f0b;
+    --surface:  #12160f;
+    --accent:   #34e06e;
+    --accent-dim: rgba(52, 224, 110, 0.72);
+    --text:     #eafff0;
+    --muted:    #7f9b86;
+    --rule:     #1e2a20;
+    --shadow:   rgba(0, 0, 0, 0.5);
+  }
+
+  :root[data-theme="light"] {
+    --canvas:   #ffffff;
+    --surface:  #f4f6f2;
+    --accent:   #12a150;
+    --accent-dim: rgba(18, 161, 80, 0.78);
+    --text:     #0b0f0b;
+    --muted:    #55665c;
+    --rule:     #e4e6e1;
+    --shadow:   rgba(11, 15, 11, 0.06);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: var(--step-0);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 60rem;
+    margin-inline: auto;
+    padding: 0 clamp(1.25rem, 5vw, 3rem);
+  }
+
+  /* ---------- hero ---------- */
+
+  .hero {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    padding: clamp(3.5rem, 12vh, 7rem) 0 clamp(2.5rem, 7vh, 4rem);
+  }
+
+  .mark { width: clamp(72px, 14vw, 104px); height: auto; display: block; }
+  .mark .solid { fill: var(--accent); }
+  .mark .gap {
+    fill: none;
+    stroke: var(--accent-dim);
+    stroke-width: 11.8;
+    stroke-dasharray: 25.6 20.5;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mark .gap {
+      stroke-dashoffset: 560;
+      animation: draw-gap 1.1s cubic-bezier(0.22, 0.68, 0.3, 1) 0.35s forwards;
+    }
+    .mark .solid { opacity: 0; animation: settle 0.5s ease-out forwards; }
+    .mark .solid:nth-of-type(2) { animation-delay: 0.08s; }
+    .mark .solid:nth-of-type(3) { animation-delay: 0.16s; }
+  }
+  @keyframes draw-gap { to { stroke-dashoffset: 0; } }
+  @keyframes settle { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .wordmark {
+    margin: 0;
+    font-size: var(--step-3);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+  .wordmark .foss { color: var(--accent); }
+
+  .tagline {
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--step-1);
+    max-width: var(--measure);
+    text-wrap: balance;
+  }
+
+  .statement {
+    margin: 0;
+    max-width: var(--measure);
+    font-size: var(--step-1);
+    line-height: 1.6;
+  }
+
+  /* ---------- sections ---------- */
+
+  section { padding-block: clamp(2.5rem, 7vh, 4.5rem); border-top: 1px solid var(--rule); }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--muted);
+    font-size: var(--step--1);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin: 0 0 1.5rem;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 0.66em;
+    height: 0.66em;
+    border: 1.5px dashed var(--accent-dim);
+    border-radius: 2px;
+    flex: none;
+  }
+
+  h2 { font-size: var(--step-2); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; margin: 0; }
+  .lede { max-width: var(--measure); color: var(--muted); margin: 0.85rem 0 0; }
+
+  /* ---------- component table ---------- */
+
+  .table-scroll { overflow-x: auto; margin-top: 2rem; }
+  table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+  th, td { text-align: left; padding: 0.85rem 1rem 0.85rem 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  th {
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+  }
+  td.role { white-space: normal; color: var(--muted); min-width: 22ch; }
+  td .repo { font-weight: 700; }
+  .ver { font-variant-numeric: tabular-nums; color: var(--accent); }
+  .ver.none { color: var(--muted); }
+
+  /* ---------- download grid ---------- */
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.25rem;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1.5px solid transparent;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.18s ease, transform 0.18s ease;
+  }
+  .card:hover, .card:focus-visible { border-color: var(--accent); transform: translateY(-2px); }
+
+  /* the gap: a component with no release yet, drawn as the mark's fourth square */
+  .card.pending {
+    background: transparent;
+    border: 1.5px dashed var(--accent-dim);
+  }
+  .card.pending:hover, .card.pending:focus-visible { border-style: dashed; }
+
+  .card .name { font-weight: 700; }
+  .card .cta { color: var(--accent); font-size: var(--step--1); margin-top: 0.3rem; }
+  {# #2: generalized from ".card .meta" -- the other_groups section below
+     reuses this same muted-meta-text treatment for a licence line
+     sitting directly in an .actions row, not inside a .card. #}
+  .meta { color: var(--muted); font-size: var(--step--1); }
+
+  /* ---------- links ---------- */
+
+  a { color: var(--accent); text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+  a:focus-visible, .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+  {# align-items: center added for #2's other_groups section, which puts a
+     bare text .meta span (no padding of its own) next to a padded .btn in
+     the same row -- flex's default "stretch" left plain text sitting at
+     the top of the row instead of vertically centered against the
+     button. No visible effect on the existing all-.btn actions rows
+     above/below (equal-height siblings look identical centered or
+     stretched). #}
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 2rem; }
+  .btn {
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--rule);
+    text-decoration: none;
+    color: var(--text);
+    font-size: var(--step--1);
+    transition: border-color 0.18s ease, color 0.18s ease;
+  }
+  .btn:hover, .btn:focus-visible { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- footer ---------- */
+
+  footer { padding-block: clamp(2.5rem, 7vh, 4rem) 4rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: var(--step--1); }
+  .etymology {
+    font-family: var(--serif);
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--text);
+    max-width: 54ch;
+    margin: 0 0 1.75rem;
+  }
+  .etymology em { color: var(--accent); font-style: italic; }
+  .colophon { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    {# Geometry copied verbatim from .github/profile/brand/icon.svg's three
+       solid rects + one dashed rect -- kept inline (not <img>) since the
+       colours must follow the CSS custom properties above for light/dark,
+       which a static raster/vector <img> can't do. #}
+    <svg class="mark" viewBox="0 0 512 512" role="img" aria-label="Missing FOSS mark: three filled squares and one drawn as a dashed outline">
+      <rect class="solid" x="85.5"  y="85.5"  width="151" height="151" rx="34.8"></rect>
+      <rect class="solid" x="290.9" y="85.5"  width="151" height="151" rx="34.8"></rect>
+      <rect class="solid" x="85.5"  y="290.9" width="151" height="151" rx="34.8"></rect>
+      <rect class="gap"   x="296.8" y="296.8" width="139.2" height="139.2" rx="29"></rect>
+    </svg>
+
+    <h1 class="wordmark">Missing<span class="foss">FOSS</span></h1>
+    <p class="tagline">// free software for the gaps nobody filled</p>
+
+    <p class="statement">
+      Software built for real daily use, published in case it's useful to
+      yours. No telemetry, no CDN, no growth plans — just tools that had to
+      work.
+    </p>
+  </header>
+
+  <section>
+    <p class="eyebrow">The project</p>
+    <h2>Trobar — self-hosted music library sync</h2>
+    <p class="lede">
+      Pick artists, albums, or playlists in a web app and keep them offline on
+      Android devices, DAPs, SD cards, or any folder. Your files, byte-for-byte —
+      or transcoded to MP3 when a small card asks for it.
+    </p>
+
+    <div class="actions">
+      <a class="btn primary" href="https://missing-foss.github.io/trobar-server/">Read the documentation</a>
+      <a class="btn" href="https://github.com/missing-foss/trobar-server">Server source</a>
+    </div>
+  </section>
+
+  {# #2: this section and the "Start with the server" grid below are
+     Trobar-specific -- the heading and lede genuinely describe Trobar's
+     own architecture (one server, several clients enrolling against it),
+     which isn't a claim this generator can make about a product it knows
+     nothing else about. Scoped to trobar_repos, not the full repo list,
+     so a non-Trobar product (see other_groups below) doesn't get forced
+     into "client of whatever sorts first" -- the taxonomy bug #2 was
+     filed about. #}
+  <section>
+    <p class="eyebrow">{{ trobar_repos|length }} component{{ "s" if trobar_repos|length != 1 else "" }}</p>
+    <h2>One server, {{ trobar_repos|length - 1 }} client{{ "s" if trobar_repos|length != 2 else "" }}</h2>
+    <p class="lede">
+      The server holds the library and does the work, including transcoding.
+      Everything else talks to it.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Repository</th><th scope="col">Role</th><th scope="col">Licence</th><th scope="col">Latest</th></tr>
+        </thead>
+        <tbody>
+        {% for repo in trobar_repos %}
+          <tr>
+            <td><a class="repo" href="{{ repo.html_url }}">{{ repo.name }}</a></td>
+            <td class="role">{{ repo.role }}</td>
+            <td>{{ repo.license }}</td>
+            {% if repo.version %}
+            <td class="ver">{{ repo.version }}</td>
+            {% else %}
+            <td class="ver none">unreleased</td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Install</p>
+    <h2>Start with the server</h2>
+    <p class="lede">
+      Nothing else works without it. Clients enrol against a server you run.
+    </p>
+
+    <div class="grid">
+    {% for repo in trobar_repos %}
+      {% if repo.version %}
+      <a class="card" href="{{ repo.html_url }}/releases/latest">
+        <span class="name">{{ repo.display_name }}</span>
+        <span class="meta">{% if repo.platform %}{{ repo.platform }} · {% endif %}{{ repo.version }}</span>
+        <span class="cta">Releases →</span>
+      </a>
+      {% else %}
+      <a class="card pending" href="{{ repo.html_url }}">
+        <span class="name">{{ repo.display_name }}</span>
+        <span class="meta">No release yet{{ " — " ~ repo.pending_note if repo.pending_note else "" }}</span>
+        <span class="cta">Repository →</span>
+      </a>
+      {% endif %}
+    {% endfor %}
+    </div>
+  </section>
+
+  {# #2: every OTHER product, one small section each -- generic on purpose
+     (name/role/licence/link only, no assumed server-vs-client shape),
+     since that's the one claim this generator can make about a product it
+     otherwise knows nothing about. A product with its own real multi-repo
+     relationships can earn its own hand-written section later, the same
+     way Trobar's did above -- this is the safe default until then, not
+     the final word on how any given future product should be presented. #}
+  {% for group in other_groups %}
+  <section>
+    <p class="eyebrow">Also from missing-foss</p>
+    {% for repo in group.repos %}
+    <h2>{{ repo.display_name }}</h2>
+    <p class="lede">{{ repo.role }}</p>
+    <div class="actions">
+      {% if repo.version %}
+      <a class="btn primary" href="{{ repo.html_url }}/releases/latest">Latest release ({{ repo.version }}) →</a>
+      {% else %}
+      <a class="btn primary" href="{{ repo.html_url }}">Repository →</a>
+      {% endif %}
+      <span class="meta">{{ repo.license }}</span>
+    </div>
+    {% endfor %}
+  </section>
+  {% endfor %}
+
+  <footer>
+    <p class="etymology">
+      <em>Trobar</em> is Occitan for “to find” — the verb the troubadours got
+      their name from.
+    </p>
+    <div class="colophon">
+      <span>{{ licenses_summary }}</span>
+      <a href="https://github.com/missing-foss">github.com/missing-foss</a>
+      <a href="https://github.com/missing-foss/.github/blob/main/SECURITY.md">Security policy</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // Generated at {{ generated_at }} — do not hand-edit; see README.md.
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+# SPDX-FileCopyrightText: 2026 missing-foss
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Curated overlay for the generator (generate.py) -- .github#2's own framing:
+# "a small curated overlay for the human-written parts... Everything else
+# derives" from the GitHub API (license, latest release, repo URL).
+#
+# `order` is the only thing that determines display order; a repo with no
+# entry here still appears (sorted after every entry below, alphabetically
+# among themselves) so a new repo shows up without anyone editing this file --
+# only its role/platform text stays generic until someone adds one.
+#
+# `product` groups repos that are actually part of one thing -- trobar-server
+# and its four clients all say `product: trobar`, which is what earns them
+# the shared "one server, N clients" table/grid on the page. A repo with no
+# `product` here defaults to its OWN name, i.e. a singleton product with its
+# own standalone section -- NOT lumped into `trobar` by default (#2: that
+# default is what silently mis-listed garfin, an unrelated product, as a
+# sixth Trobar client the moment it appeared in the org).
+#
+# `exclude` lists repos the generator must never list, regardless of what the
+# org API returns -- this repo itself, and the org's community-health-files
+# repo, neither of which is an application.
+
+exclude:
+  - .github
+  - missing-foss.github.io
+
+repos:
+  trobar-server:
+    order: 1
+    product: trobar
+    display_name: Server
+    role: The server, web UI, and sync API
+    platform: Docker
+    # GitHub's own licence detector reports the bare "AGPL-3.0"/"GPL-3.0" for
+    # both the -only and -or-later variant of a licence -- it can't tell
+    # them apart, since they share one licence text (the exact limitation
+    # trobar-ha#1 already ran into and documented). So `license` here is
+    # curated, not read from repo.license.spdx_id -- that field would
+    # silently under-report every repo below as -only.
+    license: AGPL-3.0-or-later
+  trobar-android:
+    order: 2
+    product: trobar
+    display_name: Android
+    role: Android phones and tablets
+    platform: APK
+    license: GPL-3.0-or-later
+  trobar-desktop:
+    order: 3
+    product: trobar
+    display_name: Desktop
+    role: Linux, macOS, Windows — SD cards and USB storage
+    platform: Linux · macOS · Windows
+    license: GPL-3.0-or-later
+  trobar-garmin:
+    order: 4
+    product: trobar
+    display_name: Garmin
+    role: Garmin watches, via Connect IQ
+    platform: Connect IQ
+    license: GPL-3.0-or-later
+  trobar-ha:
+    order: 5
+    product: trobar
+    display_name: Home Assistant
+    role: Home Assistant — watches sync status, never a sync target
+    platform: HACS
+    license: GPL-3.0-or-later
+    # #2: pending_note (used only by the template's no-release "pending"
+    # card branch) is dead now that this repo has a real release -- the
+    # exact "correct comment, self-invalidated the moment the condition it
+    # documented ended" pattern that issue was filed about. Not left behind
+    # a second time; HACS-custom-repository-not-default-store is still true
+    # and worth knowing, just moved to `role` context via `platform: HACS`
+    # instead of a note that would silently go stale again.
+  # #2: garfin is a separate product -- tag-based parental controls for
+  # Jellyfin, does not talk to trobar-server at all. No `product:` (so it
+  # defaults to its own name) is deliberate: it gets its own standalone
+  # section instead of the "one server, N clients" framing above, which
+  # would misdescribe it either way.
+  garfin:
+    order: 6
+    display_name: Garfin
+    role: Tag-based parental controls for Jellyfin
+    platform: APK
+    # Confirmed via the repo's own pubspec.yaml SPDX header, not GitHub's
+    # licence detector -- same -only/-or-later ambiguity noted above.
+    license: GPL-3.0-or-later
