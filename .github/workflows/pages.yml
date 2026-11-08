@@ -14,13 +14,7 @@
 # all actions/*, already covered by the org allowlist.
 name: pages
 on:
-  schedule:
-    # A few times a week at most is how often a release actually lands
-    # across the five sibling repos, so daily is frequent enough -- see
-    # .github#2's own reasoning for cron over a cross-repo
-    # repository_dispatch token (a materially worse trade for a few hours
-    # of latency this rarely matters).
-    - cron: "17 6 * * *"
+  # Rebuilt by a dispatch from outside when a sibling repo publishes a release.
   push:
     branches: [main]
   workflow_dispatch:

@@ -16,6 +16,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<script>
+  // A theme chosen with the toggle below, applied before the page paints.
+  // Without one, the CSS follows the system's light/dark preference.
+  try {
+    var t = localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
 <style>
   :root {
     --canvas:   #ffffff;
@@ -263,12 +271,47 @@ SPDX-License-Identifier: GPL-3.0-or-later
   }
   .etymology em { color: var(--accent); font-style: italic; }
   .colophon { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin: 0; }
+  .support { margin: 0.75rem 0 0; }
+
+  /* ---------- theme toggle ---------- */
+
+  .hero { position: relative; }
+  .theme-toggle {
+    position: absolute;
+    top: 1.25rem;
+    right: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0.45rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--rule);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .theme-toggle:hover, .theme-toggle:focus-visible { border-color: var(--accent); color: var(--accent); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .theme-toggle svg { width: 100%; height: 100%; display: block; }
+  @media (prefers-reduced-motion: no-preference) {
+    .theme-toggle { transition: border-color 0.18s ease, color 0.18s ease; }
+  }
+
+  /* ---------- a product of several repos ---------- */
+
+  .product-repo { margin-top: 1.75rem; }
+  .product-repo h3 { margin: 0; font-size: var(--step-1); }
+  .product-repo .lede { margin: 0.25rem 0 0; }
+  .product-repo .actions { margin-top: 0.75rem; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <header class="hero">
+    <button class="theme-toggle" type="button" hidden>
+      <svg class="to-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="to-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M1.5 12h2.5M20 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>
+    </button>
     {# Geometry copied verbatim from .github/profile/brand/icon.svg's three
        solid rects + one dashed rect -- kept inline (not <img>) since the
        colours must follow the CSS custom properties above for light/dark,
@@ -380,6 +423,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
   {% for group in other_groups %}
   <section>
     <p class="eyebrow">Also from missing-foss</p>
+    {% if group.repos|length > 1 %}
+    {# A product of several repos (data/repos.yaml `products:`): its own
+       heading, then each repo under it. #}
+    <h2>{{ group.title or group.key }}</h2>
+    {% if group.lede %}<p class="lede">{{ group.lede }}</p>{% endif %}
+    {% for repo in group.repos %}
+    <div class="product-repo">
+      <h3>{{ repo.display_name }}</h3>
+      <p class="lede">{{ repo.role }}</p>
+      <div class="actions">
+        {% if repo.version %}
+        <a class="btn primary" href="{{ repo.html_url }}/releases/latest">Latest release ({{ repo.version }}) →</a>
+        {% else %}
+        <a class="btn primary" href="{{ repo.html_url }}">Repository →</a>
+        {% endif %}
+        <span class="meta">{% if repo.platform %}{{ repo.platform }} · {% endif %}{{ repo.license }}</span>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
     {% for repo in group.repos %}
     <h2>{{ repo.display_name }}</h2>
     <p class="lede">{{ repo.role }}</p>
@@ -392,8 +455,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <span class="meta">{{ repo.license }}</span>
     </div>
     {% endfor %}
+    {% endif %}
   </section>
   {% endfor %}
+
+  {# The supporters who asked to be named, from data/supporters.yaml. No
+     section at all until the list has a name. #}
+  {% if supporters %}
+  <section id="thanks">
+    <h2>Thanks to</h2>
+    <p class="lede">{{ supporters|join(" · ") }}</p>
+  </section>
+  {% endif %}
 
   <footer>
     <p class="etymology">
@@ -405,12 +478,42 @@ SPDX-License-Identifier: GPL-3.0-or-later
       <a href="https://github.com/missing-foss">github.com/missing-foss</a>
       <a href="https://github.com/missing-foss/.github/blob/main/SECURITY.md">Security policy</a>
     </div>
+    <p class="support">
+      Support the projects: <a href="https://ko-fi.com/missingfoss">Ko-fi</a>
+      · <a href="https://liberapay.com/Missing-FOSS">Liberapay</a>
+    </p>
   </footer>
 
 </div>
 
 <script>
   // Generated at {{ generated_at }} — do not hand-edit; see README.md.
+
+  // The theme toggle: flips between light and dark from whatever shows now
+  // (a stored choice, else the system's), and remembers the choice where
+  // the browser allows it. Hidden until this runs, so it never shows dead.
+  (function () {
+    var root = document.documentElement;
+    var button = document.querySelector(".theme-toggle");
+    var dark = window.matchMedia("(prefers-color-scheme: dark)");
+    function shown() { return root.dataset.theme || (dark.matches ? "dark" : "light"); }
+    function label() {
+      var next = shown() === "dark" ? "light" : "dark";
+      button.setAttribute("aria-label", "Switch to " + next + " theme");
+      button.title = "Switch to " + next + " theme";
+      button.querySelector(".to-dark").style.display = next === "dark" ? "" : "none";
+      button.querySelector(".to-light").style.display = next === "light" ? "" : "none";
+    }
+    button.addEventListener("click", function () {
+      var next = shown() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem("theme", next); } catch (e) {}
+      label();
+    });
+    dark.addEventListener("change", label);
+    label();
+    button.hidden = false;
+  })();
 </script>
 </body>
 </html>

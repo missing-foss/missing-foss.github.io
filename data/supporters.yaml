@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 missing-foss
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# The "Thanks to" section on the site: one name per supporter, in the order
+# they should appear. Names only -- no amounts, no links -- and each one only
+# with that supporter's permission. This is the one list. The section only
+# appears once it holds a name.
+#
+#   supporters:
+#     - A. Name
+#     - Another Name
+supporters: []

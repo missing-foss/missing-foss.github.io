@@ -89,3 +89,34 @@ repos:
     # Confirmed via the repo's own pubspec.yaml SPDX header, not GitHub's
     # licence detector -- same -only/-or-later ambiguity noted above.
     license: GPL-3.0-or-later
+  # Three screensaver plugins for Kiosk Satellite, one product. Their GitHub
+  # descriptions are empty, so `role` here is all the text they get. Licence
+  # from each repo's own SPDX headers (all Apache-2.0).
+  literal-clock:
+    order: 7
+    product: kiosk
+    display_name: Literal Clock
+    role: A word clock — the words that tell the time light up, in nine languages
+    platform: Kiosk Satellite plugin
+    license: Apache-2.0
+  alpine-clock:
+    order: 8
+    product: kiosk
+    display_name: Alpine Clock
+    role: A station clock — the second hand waits at twelve, then the minute steps on
+    platform: Kiosk Satellite plugin
+    license: Apache-2.0
+  digital-rain-clock:
+    order: 9
+    product: kiosk
+    display_name: Digital Rain Clock
+    role: Falling glyphs, with the time forming out of the rain
+    platform: Kiosk Satellite plugin
+    license: Apache-2.0
+
+# A product of several repos gets a heading and a line of its own; a
+# single-repo product needs none (its repo's name is the heading).
+products:
+  kiosk:
+    title: Clocks for Kiosk Satellite
+    lede: Screensaver plugins for the Kiosk Satellite Android app.

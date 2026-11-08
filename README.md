@@ -13,10 +13,11 @@ committed here at all.** `.github/workflows/pages.yml` runs `generate.py`
 against live GitHub API data (the org's public repos, each one's latest
 release) plus `data/repos.yaml`'s small curated overlay, and publishes
 whatever that produces. A hand-edit to the page itself would just be
-overwritten by the next scheduled run — the fix belongs in one of:
+overwritten by the next build — the fix belongs in one of:
 
 - **`data/repos.yaml`** — a repo's display name, one-line role, download
-  platform blurb, licence, or display order. This is the *only* file meant
+  platform blurb, licence, or display order, and the heading of a product
+  made of several repos (`products:`). This is the *only* file meant
   for routine hand-editing. Release versions are not in here: every repo
   tags `vX.Y.Z`, so `generate.py` reads the latest release straight from
   the API and strips the one leading `v`.

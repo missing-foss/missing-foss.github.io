@@ -182,6 +182,22 @@ def _licenses_summary(product_groups: list[dict]) -> str:
     return " · ".join(parts)
 
 
+def load_supporters(path: Path) -> list[str]:
+    """data/supporters.yaml's names, checked: the file must say `supporters:`
+    and hold a list of non-empty names. An empty list is fine (nobody has
+    asked to be named yet); a missing key or a stray non-name is a mistake in
+    the file, and fails the build rather than publishing a broken section."""
+    with path.open(encoding="utf-8") as fh:
+        doc = yaml.safe_load(fh)
+    if not isinstance(doc, dict) or not isinstance(doc.get("supporters"), list):
+        raise ValueError(f"{path.name}: expected a `supporters:` list")
+    names = doc["supporters"]
+    bad = [n for n in names if not isinstance(n, str) or not n.strip()]
+    if bad:
+        raise ValueError(f"{path.name}: not a name: {bad!r}")
+    return [n.strip() for n in names]
+
+
 def main() -> int:
     out_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "_site"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -203,6 +219,9 @@ def main() -> int:
     product_groups = _group_by_product(repos)
     trobar_repos = next((g["repos"] for g in product_groups if g["key"] == "trobar"), [])
     other_groups = [g for g in product_groups if g["key"] != "trobar"]
+    products = overlay.get("products") or {}
+    for group in other_groups:
+        group.update(products.get(group["key"], {}))
 
     env = Environment(loader=FileSystemLoader(str(ROOT)), autoescape=True)
     template = env.get_template("template.html.j2")
@@ -210,6 +229,7 @@ def main() -> int:
         trobar_repos=trobar_repos,
         other_groups=other_groups,
         licenses_summary=_licenses_summary(product_groups),
+        supporters=load_supporters(ROOT / "data" / "supporters.yaml"),
         generated_at=datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
     )
     (out_dir / "index.html").write_text(html)
